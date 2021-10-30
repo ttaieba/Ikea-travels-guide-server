@@ -26,21 +26,39 @@ app.get("/", (req, res) => {
 client.connect(err => {
     const servicesCollection = client.db("travel_guide").collection("services");
 
-    // added data as new
+    // added service as new------------------------------
     app.post("/addServices", (req, res) => {
         servicesCollection.insertOne(req.body).then((result) => {
             res.send(result.insertedId)
         })
-        // console.log(req.body)
+
     })
 
-    // getting data for ui load------------------------
+    // getting data from db for ui load------------------------
     app.get("/services", async (req, res) => {
         const result = await servicesCollection.find({}).toArray()
         res.send(result);
 
     })
 
+    app.get('/services/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const services = await servicesCollection.findOne(query);
+        // console.log('here', id);
+        res.send(services)
+
+    })
+
+    // delete services api-------------
+    app.delete('/services/:id', async (req, res) => {
+        const id = req.params.id
+        const query = { _id: ObjectId(id) }
+
+        const result = await servicesCollection.deleteOne(query);
+        // console.log('deleted this', result)
+        res.send(result)
+    })
 
 
 
