@@ -25,6 +25,8 @@ app.get("/", (req, res) => {
 
 client.connect(err => {
     const servicesCollection = client.db("travel_guide").collection("services");
+    const ordersCollection = client.db("travel_guide").collection("orders");
+
 
     // added service as new------------------------------
     app.post("/addServices", (req, res) => {
@@ -39,9 +41,10 @@ client.connect(err => {
         const result = await servicesCollection.find({}).toArray()
         res.send(result);
 
+
     })
 
-    app.get('/services/:id', async (req, res) => {
+    app.get("/services/:id", async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
         const services = await servicesCollection.findOne(query);
@@ -51,7 +54,7 @@ client.connect(err => {
     })
 
     // delete services api-------------
-    app.delete('/services/:id', async (req, res) => {
+    app.delete("/services/:id", async (req, res) => {
         const id = req.params.id
         const query = { _id: ObjectId(id) }
 
@@ -59,6 +62,41 @@ client.connect(err => {
         // console.log('deleted this', result)
         res.send(result)
     })
+    // users order managment----------
+    app.post("/myorders", async (req, res) => {
+        const order = req.body;
+        const result = await ordersCollection.insertOne(order);
+        res.json(result);
+    })
+    app.get("/manageuser", async (req, res) => {
+        const result = await ordersCollection.find({}).toArray()
+
+        res.send(result);
+
+    })
+
+    app.delete("/manageuser/:id", async (req, res) => {
+        const id = req.params.id
+        const query = { _id: ObjectId(id) }
+
+        const result = await ordersCollection.deleteOne(query);
+        // console.log('deleted this', result)
+        res.send(result)
+    })
+    // my orders management------------
+    app.get("/myOrders/:email", async (req, res) => {
+        const result = await ordersCollection.find({ email: req.params.email }).toArray();
+        res.send(result);
+    });
+
+    app.delete("/delteOrder/:id", async (req, res) => {
+        const result = await ordersCollection.deleteOne({
+            _id: ObjectId(req.params.id),
+        });
+        res.send(result);
+    });
+
+
 
 
 
